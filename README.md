@@ -6,6 +6,44 @@ A production-ready computer vision system for cricket ball detection and trackin
 ![YOLO](https://img.shields.io/badge/YOLO-11n-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
+## 📦 Required Downloads
+
+### Model Weights (Required - 5.4MB)
+**Download trained YOLO11n model** to run inference:
+
+📥 [**Download best.pt from Google Drive**](https://drive.google.com/file/d/16SIU089-Eg6xTU8YcadvqNcBxxEs_Z_P/view?usp=sharing)
+
+**Installation:**
+```bash
+# After downloading best.pt, place it in the correct location:
+mkdir -p runs/detect/local_finetune_optimized3/weights
+mv ~/Downloads/best.pt runs/detect/local_finetune_optimized3/weights/
+```
+
+Or download directly using `gdown`:
+```bash
+pip install gdown
+gdown 16SIU089-Eg6xTU8YcadvqNcBxxEs_Z_P
+mkdir -p runs/detect/local_finetune_optimized3/weights
+mv best.pt runs/detect/local_finetune_optimized3/weights/
+```
+
+### Processed Videos (Optional - 123MB)
+**Example outputs** - 15 videos with trajectory overlays:
+
+📥 [**Download edgefleet_results_videos.tar.gz from Google Drive**](https://drive.google.com/file/d/1A_R0eAUW1ZP4l866O3iBnv2rblYNvTQH/view?usp=sharing)
+
+**Extract:**
+```bash
+# After downloading the archive
+tar -xzf edgefleet_results_videos.tar.gz
+# Videos will be in results/ directory
+```
+
+**Note:** You can generate your own results by running the inference pipeline (see Quick Start below).
+
+---
+
 ## 🚀 Quick Start
 
 ### Step 1: Setup (First Time Only)
@@ -28,13 +66,13 @@ A production-ready computer vision system for cricket ball detection and trackin
 ### Alternative: Direct Commands
 ```bash
 # Process all test videos (most common use case)
-cd scripts/inference && ./generate_all_csvs.sh
+cd code/inference && ./generate_all_csvs.sh
 
 # Train from scratch
-cd scripts/training && ./train_kaggle_pretrain.sh && ./train_local_finetune.sh
+cd code/training && ./train_kaggle_pretrain.sh && ./train_local_finetune.sh
 
 # Check status
-cd scripts/inference && ls ../output/tracked_videos/
+cd code/inference && ls ../output/tracked_videos/
 ```
 
 ## 📁 Repository Structure
@@ -44,7 +82,7 @@ edgefleet/
 ├── run.sh                           # 🚀 Main launcher (USE THIS)
 ├── setup.sh                         # One-time setup script
 │
-├── scripts/
+├── code/
 │   ├── training/                    # Model training scripts
 │   │   ├── train_kaggle_pretrain.sh
 │   │   ├── train_local_finetune.sh
@@ -162,7 +200,7 @@ edgefleet/
 
 **Usage**:
 ```bash
-cd scripts/training
+cd code/training
 ./train_kaggle_pretrain.sh
 ```
 
@@ -181,7 +219,7 @@ cd scripts/training
 
 **Usage**:
 ```bash
-cd scripts/training
+cd code/training
 ./train_local_finetune.sh
 ```
 
@@ -216,7 +254,7 @@ Step 2: train_local_finetune.sh
 
 **Usage**:
 ```bash
-cd scripts/inference
+cd code/inference
 ./predict_optimized.sh [model_path] [video_path]
 
 # Examples:
@@ -239,7 +277,7 @@ cd scripts/inference
 
 **Usage**:
 ```bash
-cd scripts/inference
+cd code/inference
 
 # Single video
 python inference_with_tracking.py --video ../../data/raw/25_nov_2025/1.mp4
@@ -274,7 +312,7 @@ python inference_with_tracking.py \
 
 **Usage**:
 ```bash
-cd scripts/inference
+cd code/inference
 ./process_all_videos.sh
 ```
 
@@ -287,7 +325,7 @@ cd scripts/inference
 
 **Usage**:
 ```bash
-cd scripts/inference
+cd code/inference
 ./generate_all_csvs.sh
 ```
 
@@ -303,13 +341,13 @@ cd scripts/inference
 
 **Usage**:
 ```bash
-cd scripts/inference
+cd code/inference
 ./run_tracking.sh
 ```
 
 ---
 
-## 📦 Dataset Configuration (scripts/utils/)
+## 📦 Dataset Configuration (code/utils/)
 
 ### kaggle_dataset.yaml
 YOLO dataset configuration for Kaggle cricket ball dataset.
@@ -317,7 +355,7 @@ YOLO dataset configuration for Kaggle cricket ball dataset.
 - **Path**: `dataset_from kaggle/`
 - **Classes**: 1 (ball)
 - **Split**: 1778 train, 63 val, 71 test
-- **Used by**: `scripts/training/train_kaggle_pretrain.sh`
+- **Used by**: `code/training/train_kaggle_pretrain.sh`
 
 ---
 
@@ -327,7 +365,7 @@ YOLO dataset configuration for local cricket dataset.
 - **Path**: `dataset_local/`
 - **Classes**: 1 (ball)
 - **Split**: 152 train, 26 val, 52 test (video-level split)
-- **Used by**: `scripts/training/train_local_finetune.sh`
+- **Used by**: `code/training/train_local_finetune.sh`
 
 ---
 
@@ -414,7 +452,7 @@ frame,timestamp,detections,tracked_objects,ball_1_x,ball_1_y,ball_1_confidence,b
 # Select: 1) Train complete pipeline
 
 # Or manually:
-cd scripts/training
+cd code/training
 ./train_kaggle_pretrain.sh && ./train_local_finetune.sh
 ```
 
@@ -424,7 +462,7 @@ cd scripts/training
 # Select: 4) Process all videos
 
 # Or directly:
-cd scripts/inference && ./generate_all_csvs.sh
+cd code/inference && ./generate_all_csvs.sh
 ```
 
 ### Process Single Video
@@ -433,13 +471,13 @@ cd scripts/inference && ./generate_all_csvs.sh
 # Select: 5) Process single video
 
 # Or directly:
-cd scripts/inference
+cd code/inference
 python inference_with_tracking.py --video ../../data/raw/25_nov_2025/1.mp4
 ```
 
 ### Custom Inference Parameters
 ```bash
-cd scripts/inference
+cd code/inference
 python inference_with_tracking.py \
     --model ../../runs/detect/local_finetune_optimized3/weights/best.pt \
     --video ../../data/raw/25_nov_2025/1.mp4 \

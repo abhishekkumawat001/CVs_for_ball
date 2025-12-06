@@ -56,7 +56,7 @@ edgefleet/
 ├── run.sh              ← 🎯 START HERE (main launcher)
 ├── setup.sh            ← Run once to install dependencies
 │
-├── scripts/            ← All scripts organized here
+├── code/            ← All scripts organized here
 │   ├── training/       ← Training scripts
 │   └── inference/      ← Detection & tracking scripts
 │

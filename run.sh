@@ -33,7 +33,7 @@ show_menu() {
 # Training functions
 train_complete() {
     echo -e "Starting complete training pipeline..."
-    cd scripts/training
+    cd code/training
     echo -e "[1/2] Kaggle pretrain"
     ./train_kaggle_pretrain.sh
     echo -e "[2/2] Local finetune"
@@ -43,30 +43,30 @@ train_complete() {
 }
 
 train_kaggle() {
-    echo -e "${GREEN}Training Kaggle pretrain model...${NC}"
-    cd scripts/training
+    echo -e "Training Kaggle pretrain model..."
+    cd code/training
     ./train_kaggle_pretrain.sh
     cd ../..
-    echo -e "${GREEN}✅ Kaggle training complete!${NC}"
+    echo -e "$✅ Kaggle training complete!"
 }
 
 train_local() {
-    echo -e "${GREEN}Training local finetune model...${NC}"
-    cd scripts/training
+    echo -e "Training local finetune model..."
+    cd code/training
     ./train_local_finetune.sh
     cd ../..
-    echo -e "${GREEN}✅ Local training complete!${NC}"
+    echo -e "✅ Local training complete!"
 }
 
 # Inference functions
 process_all() {
-    echo -e "${GREEN}Processing all videos with tracking...${NC}"
-    cd scripts/inference
+    echo -e "Processing all videos with tracking.."
+    cd code/inference
     ./generate_all_csvs.sh
     cd ../..
-    echo -e "${GREEN}✅ All videos processed!${NC}"
+    echo -e "✅ All videos processed!"
     echo ""
-    echo -e "${BLUE}Outputs saved to: output/tracked_videos/${NC}"
+    echo -e "Outputs saved to: output/tracked_videos/"
     echo "  - 15 tracked videos (*_tracked.mp4)"
     echo "  - 15 CSV files (*_detections.csv)"
     echo "  - 15 trajectory JSONs (*_trajectory.json)"
@@ -74,30 +74,30 @@ process_all() {
 
 process_single() {
     echo ""
-    echo -e "${YELLOW}Available videos:${NC}"
+    echo -e "Available videos:"
     ls data/raw/25_nov_2025/ | nl
     echo ""
-    echo -ne "${YELLOW}Enter video filename: ${NC}"
+    echo -ne "Enter video filename: "
     read video_name
     
     if [ -f "data/raw/25_nov_2025/$video_name" ]; then
-        echo -e "${GREEN}Processing $video_name...${NC}"
-        cd scripts/inference
+        echo -e "Processing $video_name..."
+        cd code/inference
         python inference_with_tracking.py --video "../../data/raw/25_nov_2025/$video_name"
         cd ../..
-        echo -e "${GREEN}✅ Video processed!${NC}"
+        echo -e "✅ Video processed!"
     else
-        echo -e "${RED}Error: Video not found${NC}"
+        echo -e "Error: Video not found"
     fi
 }
 
 # Utility functions
 check_status() {
-    echo -e "${BLUE}Repository Status:${NC}"
+    echo -e "Repository Status:"
     echo ""
     
     # Models
-    echo -e "${YELLOW}Models:${NC}"
+    echo -e "Models:"
     if [ -f "models/weights/yolo11n.pt" ]; then
         echo "  ✅ Base model: yolo11n.pt (5.4 MB)"
     else
@@ -118,7 +118,7 @@ check_status() {
     
     # Data
     echo ""
-    echo -e "${YELLOW}Datasets:${NC}"
+    echo -e "Datasets:"
     if [ -d "dataset_from kaggle" ]; then
         echo "  ✅ Kaggle dataset"
     fi
@@ -128,13 +128,13 @@ check_status() {
     
     # Test videos
     echo ""
-    echo -e "${YELLOW}Test Videos:${NC}"
+    echo -e "Test Videos:"
     video_count=$(ls data/raw/25_nov_2025/*.{mp4,mov} 2>/dev/null | wc -l)
     echo "  ✅ $video_count videos in data/raw/25_nov_2025/"
     
     # Outputs
     echo ""
-    echo -e "${YELLOW}Outputs:${NC}"
+    echo -e "Outputs:"
     if [ -d "output/tracked_videos" ]; then
         tracked_count=$(ls output/tracked_videos/*_tracked.mp4 2>/dev/null | wc -l)
         csv_count=$(ls output/tracked_videos/*_detections.csv 2>/dev/null | wc -l)
@@ -150,16 +150,16 @@ check_status() {
 }
 
 view_outputs() {
-    echo -e "${BLUE}Output Directory:${NC}"
+    echo -e "Output Directory: $(pwd)/output/tracked_videos/"
     echo ""
     if [ -d "output/tracked_videos" ]; then
-        echo -e "${YELLOW}Tracked Videos:${NC}"
+        echo -e "Tracked Videos:"
         ls -lh output/tracked_videos/*_tracked.mp4 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
         echo ""
-        echo -e "${YELLOW}CSV Files:${NC}"
+        echo -e "CSV Files:"
         ls -lh output/tracked_videos/*_detections.csv 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
         echo ""
-        echo -e "${YELLOW}Location:${NC} $(pwd)/output/tracked_videos/"
+        echo -e "Location: $(pwd)/output/tracked_videos/"
     else
         echo "  No outputs yet. Run inference first (option 4)."
     fi
@@ -195,20 +195,20 @@ while true; do
             view_outputs
             ;;
         0)
-            echo -e "${GREEN}Goodbye!${NC}"
+            echo -e "Goodbye!"
             exit 0
             ;;
         *)
-            echo -e "${RED}Invalid option. Please try again.${NC}"
+            echo -e "Invalid option. Please try again."
             ;;
     esac
     
     echo ""
-    echo -e "${YELLOW}Press Enter to continue...${NC}"
+    echo -e "Press Enter to continue..."
     read
     clear
-    echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║     Cricket Ball Detection & Tracking System              ║${NC}"
-    echo -e "${BLUE}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "╔════════════════════════════════════════════════════════════╗"
+    echo -e "║     Cricket Ball Detection & Tracking System              ║"
+    echo -e "╚════════════════════════════════════════════════════════════╝"
     echo ""
 done

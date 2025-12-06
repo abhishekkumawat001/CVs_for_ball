@@ -16,8 +16,9 @@ import json
 import csv
 import pandas as pd
 
-# Add src to path
-sys.path.append(str(Path(__file__).parent / 'src'))
+# Add src to path - go up 2 levels to reach project root, then into src
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root / 'src'))
 
 from tracking.kalman_tracker import KalmanTracker
 from tracking.trajectory import TrajectoryAnalyzer
