@@ -1,0 +1,26 @@
+# YOLO11 Dataset Configuration - Local Cricket Ball Dataset  
+# Finetune on this domain-specific dataset (230 images from your videos)
+
+path: /home/ananya/agentic_ai/edgefleet/dataset_local  # Root directory
+train: train/images  # Will be created by split script
+val: val/images
+test: test/images
+
+# Classes
+nc: 1  # Number of classes
+names: ['ball']  # Class names
+
+# Dataset Statistics
+# Total: 230 annotated frames from 15 videos
+# These are from your preprocessed cricket ball footage
+# Higher quality, domain-specific annotations
+
+# IMPORTANT: Must split by VIDEO to prevent data leakage
+# Use create_video_splits.py to organize into train/val/test
+
+# Recommended training parameters for finetuning
+# epochs: 30-50
+# imgsz: 640 (or 1280 for small objects)
+# batch: 8 (smaller for finetuning)
+# lr0: 0.001 (lower LR for finetuning)
+# Resume from Kaggle-trained weights: model=runs/train/kaggle/weights/best.pt

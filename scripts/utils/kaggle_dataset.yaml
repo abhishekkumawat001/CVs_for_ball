@@ -1,0 +1,23 @@
+# YOLO11 Dataset Configuration - Kaggle Cricket Ball Dataset
+# Pretrain on this large diverse dataset (1912 images)
+
+path: /home/ananya/agentic_ai/edgefleet/dataset_from kaggle  # Root directory
+train: train/images  # Relative to 'path'
+val: valid/images
+test: test/images
+
+# Classes
+nc: 1  # Number of classes
+names: ['ball']  # Class names
+
+# Dataset Statistics
+# Train: 1778 images (1716 jpg, 4 jpeg, 58 png)
+# Valid: 63 images (51 jpg, 4 jpeg, 8 png)
+# Test: 71 images (all jpg)
+# Total: 1912 images
+
+# Recommended training parameters for pretraining
+# epochs: 30-50
+# imgsz: 640
+# batch: 16 (adjust based on GPU memory)
+# lr0: 0.01 (default for pretraining from scratch)
