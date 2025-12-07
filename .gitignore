@@ -28,10 +28,6 @@ results/*.avi
 !results/*.csv
 !results/*.json
 
-# Extra markdown files (keep only README.md)
-CHECKLIST.md
-QUICKSTART.md
-
 # Python cache
 __pycache__/
 *.pyc
