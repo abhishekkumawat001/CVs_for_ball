@@ -23,7 +23,7 @@ for video in data/raw/25_nov_2025/*.{mp4,mov}; do
         
         python inference_with_tracking.py \
             --video "$video" \
-            --output-dir output/tracked_videos \
+            --output-dir results \
             2>&1 | grep -E "(INFO|ERROR|✅)" | tail -5
         
         echo ""
@@ -35,6 +35,6 @@ echo "✅ All videos processed"
 echo "========================================"
 echo ""
 echo "Outputs:"
-echo "  Videos: output/tracked_videos/*_tracked.mp4"
-echo "  CSVs:   output/tracked_videos/*_detections.csv"
-echo "  JSON:   output/tracked_videos/*_trajectory.json"
+echo "  Videos: results/*_tracked.mp4"
+echo "  CSVs:   results/*_detections.csv"
+echo "  JSON:   results/*_trajectory.json"

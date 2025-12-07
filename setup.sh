@@ -22,7 +22,7 @@ echo ""
 
 
 echo "Creating output directories..."
-mkdir -p output/tracked_videos
+mkdir -p results
 mkdir -p output/frames
 mkdir -p output/trajectories
 echo "Directories created"

@@ -7,13 +7,30 @@ output/
 # Model training outputs - too large for Git
 runs/
 
+# Unnecessary directories for production
+src/
+scripts/
+docs/
+models/
+dataset_local/
+edgefleet_results_videos.tar.gz
+
 # Large files hosted externally (Google Drive)
 best.pt
 *.pt
 *.pth
 *.tar.gz
+
+# Results directory - sample outputs (videos are large)
 results/*.mp4
-models/weights/*.pt
+results/*.avi
+# Keep CSV and JSON annotations
+!results/*.csv
+!results/*.json
+
+# Extra markdown files (keep only README.md)
+CHECKLIST.md
+QUICKSTART.md
 
 # Python cache
 __pycache__/

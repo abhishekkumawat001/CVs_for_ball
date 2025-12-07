@@ -13,7 +13,7 @@ echo ""
 echo "Model: optimized3 (best performing)"
 echo "Confidence: 0.1"
 echo "Image size: 1280"
-echo "Output: output/tracked_videos/"
+echo "Output: results/"
 echo ""
 echo "Processing all 15 test videos..."
 echo "=========================================="
@@ -22,7 +22,7 @@ echo ""
 python inference_with_tracking.py \
     --model runs/detect/local_finetune_optimized3/weights/best.pt \
     --input-dir data/raw/25_nov_2025 \
-    --output-dir output/tracked_videos \
+    --output-dir results \
     --conf 0.1 \
     --imgsz 1280
 
@@ -30,7 +30,7 @@ echo ""
 echo "=========================================="
 echo "✅ COMPLETE"
 echo "=========================================="
-echo "Outputs saved to: output/tracked_videos/"
+echo "Outputs saved to: results/"
 echo "  - *_tracked.mp4: Videos with tracking visualization"
 echo "  - *_trajectory.json: Trajectory data with speeds and bounces"
 echo "  - processing_summary.json: Summary of all videos"

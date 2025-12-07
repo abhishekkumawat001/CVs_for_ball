@@ -135,10 +135,10 @@ check_status() {
     # Outputs
     echo ""
     echo -e "Outputs:"
-    if [ -d "output/tracked_videos" ]; then
-        tracked_count=$(ls output/tracked_videos/*_tracked.mp4 2>/dev/null | wc -l)
-        csv_count=$(ls output/tracked_videos/*_detections.csv 2>/dev/null | wc -l)
-        json_count=$(ls output/tracked_videos/*_trajectory.json 2>/dev/null | wc -l)
+    if [ -d "results" ]; then
+        tracked_count=$(ls results/*_tracked.mp4 2>/dev/null | wc -l)
+        csv_count=$(ls results/*_detections.csv 2>/dev/null | wc -l)
+        json_count=$(ls results/*_trajectory.json 2>/dev/null | wc -l)
         echo "  📹 Tracked videos: $tracked_count"
         echo "  📊 CSV files: $csv_count"
         echo "  📈 Trajectory JSONs: $json_count"
@@ -150,16 +150,16 @@ check_status() {
 }
 
 view_outputs() {
-    echo -e "Output Directory: $(pwd)/output/tracked_videos/"
+    echo -e "Output Directory: $(pwd)/results/"
     echo ""
-    if [ -d "output/tracked_videos" ]; then
+    if [ -d "results" ]; then
         echo -e "Tracked Videos:"
-        ls -lh output/tracked_videos/*_tracked.mp4 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+        ls -lh results/*_tracked.mp4 2>/dev/null | awk '{print "  " $9 " (" $5 "})'
         echo ""
-        echo -e "CSV Files:"
-        ls -lh output/tracked_videos/*_detections.csv 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+        echo -e "Detection CSVs:"
+        ls -lh results/*_detections.csv 2>/dev/null | awk '{print "  " $9 " (" $5 "})'
         echo ""
-        echo -e "Location: $(pwd)/output/tracked_videos/"
+        echo -e "Location: $(pwd)/results/"
     else
         echo "  No outputs yet. Run inference first (option 4)."
     fi

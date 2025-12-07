@@ -77,7 +77,7 @@ class InferenceTracker:
         
         # Setup output directory
         if output_dir is None:
-            output_dir = Path("output/tracked_videos")
+            output_dir = Path("results")
         else:
             output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -330,7 +330,7 @@ def main():
                        default='data/raw/25_nov_2025',
                        help='Directory with test videos')
     parser.add_argument('--output-dir', type=str,
-                       default='output/tracked_videos',
+                       default='results',
                        help='Output directory')
     parser.add_argument('--conf', type=float, default=0.1,
                        help='Confidence threshold')

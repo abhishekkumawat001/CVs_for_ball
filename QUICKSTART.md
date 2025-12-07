@@ -17,7 +17,7 @@ Then select **Option 4** to process all videos.
 ## That's It! 🎉
 
 ### Outputs
-All results will be in: `output/tracked_videos/`
+All results will be in: `results/`
 - 15 tracked videos with trajectories
 - 15 CSV files with frame-by-frame data
 - 15 trajectory JSON files with analytics
@@ -71,7 +71,7 @@ edgefleet/
 
 **Check status**: `./run.sh` → Option 6  
 **View README**: `cat README.md`  
-**Check outputs**: `ls output/tracked_videos/`
+**Check outputs**: `ls results/`
 
 ---
 

@@ -54,8 +54,17 @@ fi
 ## 🚀 Quick Start
 
 ### Step 1: Setup (First Time Only)
+
+**Option A: Using environment.yml (Recommended)**
 ```bash
-# Create and activate a Python environment (recommended)
+# Create environment from yml file
+conda env create -f environment.yml
+conda activate cricket-vision
+```
+
+**Option B: Manual setup**
+```bash
+# Create and activate a Python environment
 conda create -n cricket-vision python=3.10
 conda activate cricket-vision
 
@@ -91,7 +100,7 @@ cd code/inference && ./generate_all_csvs.sh
 cd code/training && ./train_kaggle_pretrain.sh && ./train_local_finetune.sh
 
 # Check status
-cd code/inference && ls ../output/tracked_videos/
+cd code/inference && ls ../../results/
 ```
 
 ## 📁 Repository Structure
@@ -100,12 +109,12 @@ cd code/inference && ls ../output/tracked_videos/
 edgefleet/
 ├── run.sh                           # 🚀 Main launcher (USE THIS)
 ├── setup.sh                         # One-time setup script
+├── README.md                        # Documentation
+├── requirements.txt                 # Python dependencies
+├── environment.yml                  # Conda environment file
+├── LICENSE
 │
-├── code/
-│   ├── training/                    # Model training scripts
-│   │   ├── train_kaggle_pretrain.sh
-│   │   ├── train_local_finetune.sh
-│   │
+├── code/                            # All source code and scripts
 │   ├── inference/                   # Detection & tracking scripts
 │   │   ├── inference_with_tracking.py
 │   │   ├── predict_optimized.sh
@@ -113,31 +122,25 @@ edgefleet/
 │   │   ├── generate_all_csvs.sh
 │   │   └── run_tracking.sh
 │   │
-│   └── utils/                       # Configuration files
-│       ├── kaggle_dataset.yaml
-│       └── local_dataset.yaml
-│
-├── src/                             # Core source code
-│   ├── detection/                   # Ball detection modules
+│   ├── training/                    # Model training scripts
+│   │   ├── train_kaggle_pretrain.sh
+│   │   └── train_local_finetune.sh
+│   │
 │   ├── tracking/                    # Tracking algorithms (Kalman, Optical Flow)
+│   ├── detection/                   # Ball detection modules
 │   ├── preprocessing/               # Video/image preprocessing
 │   ├── postprocessing/              # Visualization and output
-│   └── utils/                       # Utility functions
+│   └── utils/                       # Configuration files & utilities
 │
-├── data/
-│   ├── raw/25_nov_2025/            # 15 test videos
-│   └── processed/
+├── annotations/                     # CSV annotation files (frame,x,y,visible)
+│   ├── 1_detections.csv
+│   ├── 2_detections.csv
+│   └── ...
 │
-├── output/
-│   ├── tracked_videos/              # Tracked videos + CSVs + JSONs
-│   ├── frames/
-│   └── trajectories/
-│
-├── runs/detect/                     # Training runs
-│   ├── kaggle_pretrain_optimized2/
-│   └── local_finetune_optimized3/   # Production model
-│
-├── models/
+└── results/                         # Processed videos with overlays
+    ├── *_tracked.mp4                # Video outputs
+    ├── *_detections.csv             # Detection annotations
+    └── *_trajectory.json            # Trajectory data
 │   └── weights/
 │       └── yolo11n.pt               # Base YOLO11n model
 │
@@ -322,7 +325,7 @@ python inference_with_tracking.py \
 - `--model`: Model path (default: optimized3/best.pt)
 - `--conf`: Confidence threshold (default: 0.1)
 - `--imgsz`: Image size (default: 1280)
-- `--output-dir`: Output directory (default: output/tracked_videos)
+- `--output-dir`: Output directory (default: results)
 
 ---
 
@@ -348,7 +351,7 @@ cd code/inference
 ./generate_all_csvs.sh
 ```
 
-**Output**: `output/tracked_videos/`
+**Output**: `results/`
 - 15 tracked videos (`*_tracked.mp4`)
 - 15 CSV files (`*_detections.csv`)
 - 15 trajectory JSONs (`*_trajectory.json`)
@@ -512,7 +515,7 @@ All paths are relative to the repository root:
 - **Models**: `runs/detect/*/weights/best.pt`
 - **Datasets**: `dataset_from kaggle/`, `dataset_local/`
 - **Test videos**: `data/raw/25_nov_2025/` (15 videos)
-- **Outputs**: `output/tracked_videos/`
+- **Outputs**: `results/`
 
 **Important**: All scripts must be run from their respective directories to ensure correct path resolution.
 
