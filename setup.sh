@@ -29,19 +29,19 @@ echo "Directories created"
 echo ""
 
 # Check datasets
-echo "Checking datasets..."
-if [ -d "dataset_from kaggle" ]; then
-    echo "✓ Kaggle dataset found"
-else
-    echo "⚠ Kaggle dataset not found"
-fi
+# echo "Checking datasets..."
+# if [ -d "dataset_from kaggle" ]; then
+#     echo "✓ Kaggle dataset found"
+# else
+#     echo "⚠ Kaggle dataset not found"
+# fi
 
-if [ -d "dataset_local" ]; then
-    echo "✓ Local dataset found"
-else
-    echo "⚠ Local dataset not found"
-fi
-echo ""
+# if [ -d "dataset_local" ]; then
+#     echo "✓ Local dataset found"
+# else
+#     echo "⚠ Local dataset not found"
+# fi
+# echo ""
 
 # Check base model
 echo "Checking base model..."
