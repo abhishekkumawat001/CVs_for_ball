@@ -17,10 +17,13 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Get absolute path to script directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Google Drive IDs
 MODEL_GDRIVE_ID="16SIU089-Eg6xTU8YcadvqNcBxxEs_Z_P"
 VIDEOS_GDRIVE_ID="1A_R0eAUW1ZP4l866O3iBnv2rblYNvTQH"
-MODEL_PATH="runs/detect/local_finetune_optimized3/weights/best.pt"
+MODEL_PATH="${SCRIPT_DIR}/runs/detect/local_finetune_optimized3/weights/best.pt"
 
 # Function to show menu
 show_menu() {
@@ -56,11 +59,11 @@ download_model() {
     fi
     
     # Create directory
-    mkdir -p runs/detect/local_finetune_optimized3/weights
+    mkdir -p "${SCRIPT_DIR}/runs/detect/local_finetune_optimized3/weights"
     
     # Download model
     echo "Downloading from Google Drive (5.4 MB)..."
-    gdown ${MODEL_GDRIVE_ID} -O ${MODEL_PATH}
+    gdown ${MODEL_GDRIVE_ID} -O "${MODEL_PATH}"
     
     if [ -f "${MODEL_PATH}" ]; then
         echo -e "${GREEN}✅ Model downloaded successfully!${NC}"
@@ -82,24 +85,24 @@ download_results() {
         pip install -q gdown
     fi
     
-    mkdir -p results
+    mkdir -p "${SCRIPT_DIR}/results"
     
     echo "Downloading from Google Drive..."
-    gdown ${VIDEOS_GDRIVE_ID} -O results/edgefleet_results_videos.tar.gz
+    gdown ${VIDEOS_GDRIVE_ID} -O "${SCRIPT_DIR}/results/edgefleet_results_videos.tar.gz"
     
-    if [ -f "results/edgefleet_results_videos.tar.gz" ]; then
+    if [ -f "${SCRIPT_DIR}/results/edgefleet_results_videos.tar.gz" ]; then
         echo "Extracting archive..."
-        tar -xzf results/edgefleet_results_videos.tar.gz -C results
-        rm results/edgefleet_results_videos.tar.gz
+        tar -xzf "${SCRIPT_DIR}/results/edgefleet_results_videos.tar.gz" -C "${SCRIPT_DIR}/results"
+        rm "${SCRIPT_DIR}/results/edgefleet_results_videos.tar.gz"
         
         # Fix directory structure if needed
-        if [ -d "results/results" ]; then
-            mv results/results/* results/
-            rm -r results/results
+        if [ -d "${SCRIPT_DIR}/results/results" ]; then
+            mv "${SCRIPT_DIR}/results/results"/* "${SCRIPT_DIR}/results/"
+            rm -r "${SCRIPT_DIR}/results/results"
         fi
         
         echo -e "${GREEN}✅ Sample results downloaded and extracted!${NC}"
-        echo "Location: results/"
+        echo "Location: ${SCRIPT_DIR}/results/"
     else
         echo -e "${RED}❌ Download failed. Please download manually from:${NC}"
         echo "https://drive.google.com/file/d/${VIDEOS_GDRIVE_ID}/view"
@@ -133,8 +136,8 @@ process_all() {
         return 1
     fi
     
-    # Count videos
-    video_count=$(find "$video_dir" -maxdepth 1 -type f \( -name "*.mp4" -o -name "*.mov" -o -name "*.avi" -o -name "*.MP4" -o -name "*.MOV" \) 2>/dev/null | wc -l)
+    # Count videos using find
+    video_count=$(find "$video_dir" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.mov" -o -iname "*.avi" \) 2>/dev/null | wc -l)
     
     if [ "$video_count" -eq 0 ]; then
         echo -e "${RED}❌ No video files found in: $video_dir${NC}"
@@ -147,7 +150,7 @@ process_all() {
     
     # List videos
     echo -e "${YELLOW}Videos to process:${NC}"
-    find "$video_dir" -maxdepth 1 -type f \( -name "*.mp4" -o -name "*.mov" -o -name "*.avi" -o -name "*.MP4" -o -name "*.MOV" \) | nl
+    find "$video_dir" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.mov" -o -iname "*.avi" \) | nl
     echo ""
     
     echo -ne "Process all these videos? (y/n): "
@@ -162,28 +165,25 @@ process_all() {
     echo -e "${YELLOW}Processing videos...${NC}"
     
     # Create output directory
-    mkdir -p results
+    mkdir -p "${SCRIPT_DIR}/results"
     
     # Process each video
     processed=0
-    for video_file in "$video_dir"/*.{mp4,mov,avi,MP4,MOV} 2>/dev/null; do
-        # Skip if glob didn't match
-        [ -e "$video_file" ] || continue
-        
+    while IFS= read -r video_file; do
         filename=$(basename "$video_file")
         echo -e "${YELLOW}[$((processed+1))/$video_count] Processing: $filename${NC}"
         
-        cd code/inference
-        python inference_with_tracking.py --video "$video_file" --output "../../results/"
-        cd ../..
+        cd "${SCRIPT_DIR}/code/inference"
+        python inference_with_tracking.py --model "${MODEL_PATH}" --video "$video_file" --output-dir "${SCRIPT_DIR}/results/" 2>&1 | grep -v "^$"
+        cd "${SCRIPT_DIR}"
         
         ((processed++))
-    done
+    done < <(find "$video_dir" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.mov" -o -iname "*.avi" \))
     
     echo ""
     echo -e "${GREEN}✅ Processed $processed video(s) successfully!${NC}"
     echo ""
-    echo "Outputs saved to: results/"
+    echo "Outputs saved to: ${SCRIPT_DIR}/results/"
     echo "  - Tracked videos (*_tracked.mp4)"
     echo "  - Detection CSVs (*_detections.csv)"
     echo "  - Trajectory JSONs (*_trajectory.json)"
@@ -210,6 +210,11 @@ process_single() {
     # Expand tilde and resolve path
     video_path="${video_path/#\~/$HOME}"
     
+    # Convert relative path to absolute
+    if [[ ! "$video_path" = /* ]]; then
+        video_path="${SCRIPT_DIR}/${video_path}"
+    fi
+    
     if [ ! -f "$video_path" ]; then
         echo -e "${RED}❌ Video file not found: $video_path${NC}"
         return 1
@@ -219,14 +224,15 @@ process_single() {
     echo -e "${YELLOW}Processing: $filename${NC}"
     echo ""
     
-    mkdir -p results
+    mkdir -p "${SCRIPT_DIR}/results"
     
-    cd code/inference
-    python inference_with_tracking.py --video "$video_path" --output "../../results/"
-    cd ../..
+    cd "${SCRIPT_DIR}/code/inference"
+    python inference_with_tracking.py --model "${MODEL_PATH}" --video "$video_path" --output-dir "${SCRIPT_DIR}/results/"
+    cd "${SCRIPT_DIR}"
     
+    echo ""
     echo -e "${GREEN}✅ Video processed successfully!${NC}"
-    echo "Output saved to: results/"
+    echo "Output saved to: ${SCRIPT_DIR}/results/"
 }
 
 # View sample annotations
@@ -239,12 +245,12 @@ view_annotations() {
     echo "  - visible: 1 (detected), 0 (not detected, x=-1, y=-1)"
     echo ""
     
-    if [ -f "annotations/1_detections.csv" ]; then
+    if [ -f "${SCRIPT_DIR}/annotations/1_detections.csv" ]; then
         echo -e "${YELLOW}Example from annotations/1_detections.csv:${NC}"
-        head -10 annotations/1_detections.csv
+        head -10 "${SCRIPT_DIR}/annotations/1_detections.csv"
         echo "..."
         echo ""
-        total_frames=$(tail -n +2 annotations/1_detections.csv | wc -l)
+        total_frames=$(tail -n +2 "${SCRIPT_DIR}/annotations/1_detections.csv" | wc -l)
         echo "Total frames in this video: $total_frames"
     else
         echo -e "${RED}No sample annotations found.${NC}"
@@ -271,10 +277,10 @@ check_status() {
     
     # Outputs
     echo "📊 Results:"
-    if [ -d "results" ]; then
-        tracked_count=$(find results -name "*_tracked.mp4" 2>/dev/null | wc -l)
-        csv_count=$(find results -name "*_detections.csv" 2>/dev/null | wc -l)
-        json_count=$(find results -name "*_trajectory.json" 2>/dev/null | wc -l)
+    if [ -d "${SCRIPT_DIR}/results" ]; then
+        tracked_count=$(find "${SCRIPT_DIR}/results" -name "*_tracked.mp4" 2>/dev/null | wc -l)
+        csv_count=$(find "${SCRIPT_DIR}/results" -name "*_detections.csv" 2>/dev/null | wc -l)
+        json_count=$(find "${SCRIPT_DIR}/results" -name "*_trajectory.json" 2>/dev/null | wc -l)
         
         if [ "$tracked_count" -gt 0 ] || [ "$csv_count" -gt 0 ]; then
             echo -e "  ${GREEN}✅ Tracked videos: $tracked_count${NC}"
@@ -292,8 +298,8 @@ check_status() {
     
     # Sample annotations
     echo "📝 Sample Annotations:"
-    if [ -d "annotations" ]; then
-        annotation_count=$(find annotations -name "*_detections.csv" 2>/dev/null | wc -l)
+    if [ -d "${SCRIPT_DIR}/annotations" ]; then
+        annotation_count=$(find "${SCRIPT_DIR}/annotations" -name "*_detections.csv" 2>/dev/null | wc -l)
         echo -e "  ${GREEN}✅ $annotation_count sample CSV files${NC}"
     fi
     
@@ -305,28 +311,28 @@ view_outputs() {
     echo -e "${YELLOW}Output Results:${NC}"
     echo ""
     
-    if [ -d "results" ] && [ "$(ls -A results 2>/dev/null)" ]; then
-        echo "Location: $(pwd)/results/"
+    if [ -d "${SCRIPT_DIR}/results" ] && [ "$(ls -A ${SCRIPT_DIR}/results 2>/dev/null)" ]; then
+        echo "Location: ${SCRIPT_DIR}/results/"
         echo ""
         
         # Tracked videos
-        if ls results/*_tracked.mp4 1> /dev/null 2>&1; then
+        if ls "${SCRIPT_DIR}/results"/*_tracked.mp4 1> /dev/null 2>&1; then
             echo "🎥 Tracked Videos:"
-            ls -lh results/*_tracked.mp4 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+            ls -lh "${SCRIPT_DIR}/results"/*_tracked.mp4 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
             echo ""
         fi
         
         # CSVs
-        if ls results/*_detections.csv 1> /dev/null 2>&1; then
+        if ls "${SCRIPT_DIR}/results"/*_detections.csv 1> /dev/null 2>&1; then
             echo "📊 Detection CSVs:"
-            ls -lh results/*_detections.csv 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+            ls -lh "${SCRIPT_DIR}/results"/*_detections.csv 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
             echo ""
         fi
         
         # JSONs
-        if ls results/*_trajectory.json 1> /dev/null 2>&1; then
+        if ls "${SCRIPT_DIR}/results"/*_trajectory.json 1> /dev/null 2>&1; then
             echo "📈 Trajectory JSONs:"
-            ls -lh results/*_trajectory.json 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+            ls -lh "${SCRIPT_DIR}/results"/*_trajectory.json 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
             echo ""
         fi
     else
