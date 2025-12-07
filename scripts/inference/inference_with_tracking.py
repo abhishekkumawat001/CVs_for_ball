@@ -16,8 +16,9 @@ import json
 import csv
 import pandas as pd
 
-# Add src to path
-sys.path.append(str(Path(__file__).parent / 'src'))
+# Add code directory to path for imports
+project_root = Path(__file__).parent.parent.parent / 'code'
+sys.path.insert(0, str(project_root))
 
 from tracking.kalman_tracker import KalmanTracker
 from tracking.trajectory import TrajectoryAnalyzer
