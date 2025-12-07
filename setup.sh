@@ -49,7 +49,7 @@ if [ -f "models/weights/yolo11n.pt" ]; then
     echo "✓ Base model found: yolo11n.pt"
 else
     echo "⚠ Base model not found"
-    echo "  Download from: https://github.com/ultralytics/assets/releases/download/v0.0.0/yolo11n.pt"
+    echo "Download from: https://github.com/ultralytics/assets/releases/download/v0.0.0/yolo11n.pt"
 fi
 echo ""
 

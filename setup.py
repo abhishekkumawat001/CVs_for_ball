@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="cricket-ball-tracker",
     version="1.0.0",
-    author="IISc EdgeFleet AI Team",
+    author="EdgeFleet AI Team",
     description="Computer Vision System for Cricket Ball Tracking",
     long_description=long_description,
     long_description_content_type="text/markdown",
