@@ -1,26 +1,20 @@
 #!/bin/bash
-# Optimized YOLO11 Training Script for RTX A6000 GPUs
+# YOLO11 Training Script
 # Ball Detection - Kaggle Dataset Pretraining
 
 set -e
 
-# Activate conda environment
-eval "$(conda shell.bash hook)"
-conda activate swe
+# Note: Activate your Python environment before running this script
+# Example: conda activate your_env_name
 
 # ============================================================================
 # GPU CONFIGURATION
 # ============================================================================
-# You have 3x RTX A6000 (48GB each)
-# GPU 0: Available (48.6GB free) ✅
-# GPU 1: In use (39GB free) - avoid
-# GPU 2: Available (48.6GB free) ✅
-
-# Select GPUs to use (GPU 0 and 2 are free)
-export CUDA_VISIBLE_DEVICES=0,2
+# Configure GPUs to use (adjust based on your available GPUs)
+# export CUDA_VISIBLE_DEVICES=0,1  # Uncomment to select specific GPUs
 
 # ============================================================================
-# TRAINING CONFIGURATION - OPTIMIZED FOR YOUR HARDWARE
+# TRAINING CONFIGURATION
 # ============================================================================
 
 # Model
@@ -30,10 +24,10 @@ MODEL="../../models/weights/yolo11n.pt"  # Nano model - good starting point
 DATA="../utils/kaggle_dataset.yaml"
 
 # Training hyperparameters
-EPOCHS=50          # Increased from 30 - more training with 1778 images
-BATCH=32           # Increased from 16 - you have 48GB GPU!
-IMGSZ=640          # Standard for YOLO, good for mixed object sizes
-WORKERS=16         # CPU workers for data loading (you have plenty of CPU)
+EPOCHS=50          # Training epochs
+BATCH=32           # Batch size (adjust based on GPU memory)
+IMGSZ=640          # Input image size
+WORKERS=16         # CPU workers for data loading (adjust based on available CPU cores)
 
 # Learning rate
 LR0=0.01           # Initial learning rate
@@ -75,10 +69,10 @@ echo "Configuration:"
 echo "  Model: $MODEL"
 echo "  Dataset: $DATA"
 echo "  Epochs: $EPOCHS"
-echo "  Batch size: $BATCH (effective: $BATCH x 2 GPUs = $(($BATCH * 2)))"
+echo "  Batch size: $BATCH"
 echo "  Image size: $IMGSZ"
 echo "  Optimizer: $OPTIMIZER"
-echo "  GPUs: $DEVICE (2x RTX A6000)"
+echo "  GPUs: $DEVICE"
 echo "  Workers: $WORKERS"
 echo "================================================================================"
 

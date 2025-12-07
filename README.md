@@ -17,7 +17,8 @@ A production-ready computer vision system for cricket ball detection and trackin
 ```bash
 # After downloading best.pt, place it in the correct location:
 mkdir -p runs/detect/local_finetune_optimized3/weights
-mv ~/Downloads/best.pt runs/detect/local_finetune_optimized3/weights/
+mv best.pt runs/detect/local_finetune_optimized3/weights/
+# Note: Adjust the source path if you downloaded to a different location
 ```
 
 Or download directly using `gdown`:
@@ -54,11 +55,23 @@ fi
 
 ### Step 1: Setup (First Time Only)
 ```bash
+# Create and activate a Python environment (recommended)
+conda create -n cricket-vision python=3.10
+conda activate cricket-vision
+
+# OR use venv
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
 # Install dependencies
 ./setup.sh
 ```
 
 ### Step 2: Run the System
+```bash
+# Activate your environment first
+conda activate cricket-vision  # or: source venv/bin/activate
+```
 ```bash
 # Launch interactive menu
 ./run.sh
@@ -508,10 +521,9 @@ All paths are relative to the repository root:
 ## 🔧 Requirements
 
 - Python 3.10+
-- CUDA 12.8
-- Conda environment: `swe`
-- GPU: 3x NVIDIA RTX A6000 (47.5GB VRAM each) - recommended for training
-- Packages: `ultralytics`, `opencv-python`, `numpy`, `scipy`
+- CUDA-enabled GPU (recommended for training)
+- Python environment (conda or venv)
+- Packages: `ultralytics`, `opencv-python`, `numpy`, `scipy`, `torch` (see `requirements.txt`)
 
 ---
 
@@ -519,10 +531,10 @@ All paths are relative to the repository root:
 
 - All scripts use production model: `local_finetune_optimized3/weights/best.pt`
 - Default confidence threshold: 0.1 (adjustable with `--conf` parameter)
-- Training requires GPU (3x RTX A6000 recommended)
-- Total training time: ~40-50 minutes
-- Inference time: ~3-4 minutes for 15 videos
-- Conda environment `swe` must be activated
+- Training requires GPU (multi-GPU support available)
+- Approximate training time: ~40-50 minutes (varies by hardware)
+- Inference time: ~3-4 minutes for 15 videos (varies by hardware)
+- Activate your conda environment before running scripts
 - Video-level dataset splitting prevents frame leakage
 
 ---

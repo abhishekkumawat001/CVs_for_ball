@@ -4,9 +4,8 @@
 
 set -e
 
-# Activate conda environment
-eval "$(conda shell.bash hook)"
-conda activate swe
+# Note: Activate your Python environment before running this script
+# Example: conda activate your_env_name
 
 # ============================================================================
 # CONFIGURATION

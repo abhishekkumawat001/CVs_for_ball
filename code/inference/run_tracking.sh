@@ -3,8 +3,8 @@
 
 set -e
 
-eval "$(conda shell.bash hook)"
-conda activate swe
+# Note: Activate your Python environment before running this script
+# Example: conda activate your_env_name
 
 echo "=========================================="
 echo "YOLO Detection + Kalman Tracking Pipeline"

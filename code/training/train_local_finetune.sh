@@ -1,17 +1,16 @@
 #!/bin/bash
-# Optimized YOLO11 Finetuning Script for Local Dataset
+# YOLO11 Finetuning Script for Local Dataset
 # Ball Detection - Domain-Specific Finetuning
 
 set -e
 
-# Activate conda environment
-eval "$(conda shell.bash hook)"
-conda activate swe
+# Note: Activate your Python environment before running this script
+# Example: conda activate your_env_name
 
 # ============================================================================
 # GPU CONFIGURATION
 # ============================================================================
-export CUDA_VISIBLE_DEVICES=0  # Use single GPU for finetuning (small dataset)
+# export CUDA_VISIBLE_DEVICES=0  # Uncomment to select specific GPU
 
 # ============================================================================
 # TRAINING CONFIGURATION - FINETUNE FROM KAGGLE
@@ -72,8 +71,8 @@ echo "  Epochs: $EPOCHS"
 echo "  Batch size: $BATCH"
 echo "  Image size: $IMGSZ"
 echo "  Optimizer: $OPTIMIZER"
-echo "  Learning rate: $LR0 (20x lower for finetuning)"
-echo "  GPU: 0 (RTX A6000)"
+echo "  Learning rate: $LR0 (lower for finetuning)"
+echo "  GPU: device=0"
 echo "  Workers: $WORKERS"
 echo "  Training mode: Finetune from Kaggle pretrained weights"
 echo "================================================================================"
