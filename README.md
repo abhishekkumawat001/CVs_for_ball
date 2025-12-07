@@ -36,7 +36,9 @@ mv best.pt runs/detect/local_finetune_optimized3/weights/
 **Extract:**
 ```bash
 # After downloading the archive
-tar -xzf edgefleet_results_videos.tar.gz
+mkdir -p results
+gdown 1A_R0eAUW1ZP4l866O3iBnv2rblYNvTQH -O results/edgefleet_results_videos.tar.gz
+tar -xzf results/edgefleet_results_videos.tar.gz -C results
 # Videos will be in results/ directory
 ```
 
@@ -551,3 +553,4 @@ For questions and support:
 - Indian Institute of Science (IISc)
 - Ultralytics YOLO Community
 - OpenCV Community
+
