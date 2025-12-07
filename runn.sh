@@ -31,8 +31,8 @@ show_menu() {
     echo "    2) Download sample results videos (optional)"
     echo ""
     echo "  INFERENCE (Main Demo):"
-    echo "    3) Process all videos (generate tracked videos + CSVs) ⭐"
-    echo "    4) Process single video"
+    echo "    3) Process videos from custom directory ⭐"
+    echo "    4) Process single video (specify path)"
     echo "    5) View sample annotations (CSV format)"
     echo ""
     echo "  UTILITIES:"
@@ -106,7 +106,7 @@ download_results() {
     fi
 }
 
-# Process all videos
+# Process all videos from custom directory
 process_all() {
     # Check if model exists
     if [ ! -f "${MODEL_PATH}" ]; then
@@ -115,24 +115,73 @@ process_all() {
         return 1
     fi
     
-    # Check if videos exist
-    video_count=$(find data/raw/25_nov_2025 -type f \( -name "*.mp4" -o -name "*.mov" \) 2>/dev/null | wc -l)
-    if [ "$video_count" -eq 0 ]; then
-        echo -e "${RED}❌ No test videos found in data/raw/25_nov_2025/${NC}"
-        echo "Please add your test videos to process."
+    echo ""
+    echo -e "${YELLOW}Enter the directory containing your videos:${NC}"
+    echo "Examples:"
+    echo "  - Relative: ./videos or data/raw/test_videos"
+    echo "  - Absolute: /home/user/Downloads/cricket_videos"
+    echo ""
+    echo -ne "Video directory path: "
+    read video_dir
+    
+    # Expand tilde and resolve path
+    video_dir="${video_dir/#\~/$HOME}"
+    
+    # Check if directory exists
+    if [ ! -d "$video_dir" ]; then
+        echo -e "${RED}❌ Directory not found: $video_dir${NC}"
         return 1
     fi
     
-    echo -e "${YELLOW}Processing all videos with tracking...${NC}"
-    echo "Found $video_count videos"
+    # Count videos
+    video_count=$(find "$video_dir" -maxdepth 1 -type f \( -name "*.mp4" -o -name "*.mov" -o -name "*.avi" -o -name "*.MP4" -o -name "*.MOV" \) 2>/dev/null | wc -l)
+    
+    if [ "$video_count" -eq 0 ]; then
+        echo -e "${RED}❌ No video files found in: $video_dir${NC}"
+        echo "Supported formats: .mp4, .mov, .avi"
+        return 1
+    fi
+    
+    echo -e "${GREEN}Found $video_count video(s)${NC}"
     echo ""
     
-    cd code/inference
-    ./generate_all_csvs.sh
-    cd ../..
+    # List videos
+    echo -e "${YELLOW}Videos to process:${NC}"
+    find "$video_dir" -maxdepth 1 -type f \( -name "*.mp4" -o -name "*.mov" -o -name "*.avi" -o -name "*.MP4" -o -name "*.MOV" \) | nl
+    echo ""
+    
+    echo -ne "Process all these videos? (y/n): "
+    read confirm
+    
+    if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+        echo "Cancelled."
+        return 0
+    fi
     
     echo ""
-    echo -e "${GREEN}✅ All videos processed successfully!${NC}"
+    echo -e "${YELLOW}Processing videos...${NC}"
+    
+    # Create output directory
+    mkdir -p results
+    
+    # Process each video
+    processed=0
+    for video_file in "$video_dir"/*.{mp4,mov,avi,MP4,MOV} 2>/dev/null; do
+        # Skip if glob didn't match
+        [ -e "$video_file" ] || continue
+        
+        filename=$(basename "$video_file")
+        echo -e "${YELLOW}[$((processed+1))/$video_count] Processing: $filename${NC}"
+        
+        cd code/inference
+        python inference_with_tracking.py --video "$video_file" --output "../../results/"
+        cd ../..
+        
+        ((processed++))
+    done
+    
+    echo ""
+    echo -e "${GREEN}✅ Processed $processed video(s) successfully!${NC}"
     echo ""
     echo "Outputs saved to: results/"
     echo "  - Tracked videos (*_tracked.mp4)"
@@ -150,27 +199,34 @@ process_single() {
     fi
     
     echo ""
-    echo -e "${YELLOW}Available videos:${NC}"
+    echo -e "${YELLOW}Enter the full path to your video file:${NC}"
+    echo "Examples:"
+    echo "  - Relative: ./video.mp4"
+    echo "  - Absolute: /home/user/Downloads/cricket.mp4"
+    echo ""
+    echo -ne "Video file path: "
+    read video_path
     
-    if [ ! -d "data/raw/25_nov_2025" ] || [ -z "$(ls -A data/raw/25_nov_2025)" ]; then
-        echo -e "${RED}No videos found in data/raw/25_nov_2025/${NC}"
+    # Expand tilde and resolve path
+    video_path="${video_path/#\~/$HOME}"
+    
+    if [ ! -f "$video_path" ]; then
+        echo -e "${RED}❌ Video file not found: $video_path${NC}"
         return 1
     fi
     
-    ls data/raw/25_nov_2025/ | nl
+    filename=$(basename "$video_path")
+    echo -e "${YELLOW}Processing: $filename${NC}"
     echo ""
-    echo -ne "Enter video filename: "
-    read video_name
     
-    if [ -f "data/raw/25_nov_2025/$video_name" ]; then
-        echo -e "${YELLOW}Processing $video_name...${NC}"
-        cd code/inference
-        python inference_with_tracking.py --video "../../data/raw/25_nov_2025/$video_name"
-        cd ../..
-        echo -e "${GREEN}✅ Video processed successfully!${NC}"
-    else
-        echo -e "${RED}❌ Error: Video not found${NC}"
-    fi
+    mkdir -p results
+    
+    cd code/inference
+    python inference_with_tracking.py --video "$video_path" --output "../../results/"
+    cd ../..
+    
+    echo -e "${GREEN}✅ Video processed successfully!${NC}"
+    echo "Output saved to: results/"
 }
 
 # View sample annotations
@@ -213,22 +269,6 @@ check_status() {
     
     echo ""
     
-    # Test videos
-    echo "🎥 Test Videos:"
-    if [ -d "data/raw/25_nov_2025" ]; then
-        video_count=$(find data/raw/25_nov_2025 -type f \( -name "*.mp4" -o -name "*.mov" \) 2>/dev/null | wc -l)
-        if [ "$video_count" -gt 0 ]; then
-            echo -e "  ${GREEN}✅ $video_count videos in data/raw/25_nov_2025/${NC}"
-        else
-            echo -e "  ${YELLOW}⚠️  No videos found in data/raw/25_nov_2025/${NC}"
-            echo "     Add your test videos here to process them"
-        fi
-    else
-        echo -e "  ${RED}❌ data/raw/25_nov_2025/ directory not found${NC}"
-    fi
-    
-    echo ""
-    
     # Outputs
     echo "📊 Results:"
     if [ -d "results" ]; then
@@ -242,7 +282,7 @@ check_status() {
             echo -e "  ${GREEN}✅ Trajectory JSONs: $json_count${NC}"
         else
             echo -e "  ${YELLOW}⚠️  No results yet${NC}"
-            echo "     Run Option 3 to process videos"
+            echo "     Run Option 3 or 4 to process videos"
         fi
     else
         echo -e "  ${YELLOW}⚠️  results/ directory not found${NC}"
@@ -291,7 +331,7 @@ view_outputs() {
         fi
     else
         echo -e "${YELLOW}⚠️  No outputs yet.${NC}"
-        echo "Run Option 3 to process videos and generate results."
+        echo "Run Option 3 or 4 to process videos and generate results."
     fi
     echo ""
 }
