@@ -39,7 +39,11 @@ mv best.pt runs/detect/local_finetune_optimized3/weights/
 mkdir -p results
 gdown 1A_R0eAUW1ZP4l866O3iBnv2rblYNvTQH -O results/edgefleet_results_videos.tar.gz
 tar -xzf results/edgefleet_results_videos.tar.gz -C results
-# Videos will be in results/ directory
+rm results/edgefleet_results_videos.tar.gz
+if [ -d "results/results" ]; then
+    mv results/results/* results/
+    rm -r results/results
+fi
 ```
 
 **Note:** You can generate your own results by running the inference pipeline (see Quick Start below).
@@ -553,4 +557,5 @@ For questions and support:
 - Indian Institute of Science (IISc)
 - Ultralytics YOLO Community
 - OpenCV Community
+
 
