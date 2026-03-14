@@ -561,16 +561,12 @@ MIT License - see LICENSE file for details
 ## 📧 Contact
 
 For questions and support:
-- Email: support@edgefleet.ai
+- Email: abhikumawat001@gmail.com
 - Issues: GitHub Issues
 
 ---
 
 ## 🙏 Acknowledgments
 
-- EdgeFleet AI Test Kit
-- Indian Institute of Science (IISc)
 - Ultralytics YOLO Community
 - OpenCV Community
-
-
